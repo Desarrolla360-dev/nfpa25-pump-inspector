@@ -7,10 +7,19 @@ import '../utils/app_colors.dart';
 /// communicates status/category at a glance (like a physical equipment tag),
 /// and the flat + hairline treatment reads as a technical document rather
 /// than a SaaS dashboard.
+///
+/// The accent bar is a separate flat layer (via `Stack`), not part of the
+/// panel's own border — `BoxDecoration` forbids a `borderRadius` on a border
+/// whose sides aren't all the same color. Sizing the bar with `Positioned`
+/// (top: 0, bottom: 0) also means this never needs the extra intrinsic-size
+/// layout pass an `IntrinsicHeight` + `Row` approach would (a pattern
+/// Flutter's performance guide warns against).
 class DataPlate extends StatelessWidget {
+  static const double _accentWidth = 4;
+
   final Widget child;
   final Color accentColor;
-  final EdgeInsetsGeometry padding;
+  final EdgeInsets padding;
   final VoidCallback? onTap;
 
   const DataPlate({
@@ -23,30 +32,38 @@ class DataPlate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final borderRadius = BorderRadius.circular(4);
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.hairline),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(width: 4, color: accentColor),
-              Expanded(
-                child: Material(
-                  color: AppColors.surfaceWhite,
-                  child: InkWell(
-                    onTap: onTap,
-                    child: Padding(padding: padding, child: child),
+      borderRadius: borderRadius,
+      child: Stack(
+        children: [
+          Material(
+            color: AppColors.surfaceWhite,
+            child: InkWell(
+              onTap: onTap,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: borderRadius,
+                  border: Border.all(color: AppColors.hairline),
+                ),
+                child: Padding(
+                  padding: padding.add(
+                    const EdgeInsets.only(left: _accentWidth),
                   ),
+                  child: child,
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: _accentWidth,
+            child: Container(color: accentColor),
+          ),
+        ],
       ),
     );
   }

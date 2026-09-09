@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -8,7 +9,18 @@ import '../models/pump_test_model.dart';
 
 class PdfGenerator {
   static Future<Uint8List> generateReport(InspectionRecord record) async {
-    final pdf = pw.Document();
+    // Embed Inter so the report can render full Unicode (tildes, ñ, °, —)
+    // instead of the PDF base-14 Helvetica, which only supports WinAnsi.
+    final baseFont = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/Inter-Regular.ttf'),
+    );
+    final boldFont = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/Inter-Bold.ttf'),
+    );
+
+    final pdf = pw.Document(
+      theme: pw.ThemeData.withFont(base: baseFont, bold: boldFont),
+    );
 
     pdf.addPage(
       pw.MultiPage(
@@ -41,7 +53,7 @@ class PdfGenerator {
       children: [
         pw.Text(
           'PETROV',
-          style: pw.TextStyle(
+          style: const pw.TextStyle(
             fontSize: 24,
             fontWeight: pw.FontWeight.bold,
             color: PdfColors.red800,
@@ -49,7 +61,7 @@ class PdfGenerator {
         ),
         pw.Text(
           'SOLUCIONES CONTRA INCENDIO',
-          style: pw.TextStyle(
+          style: const pw.TextStyle(
             fontSize: 10,
             fontWeight: pw.FontWeight.bold,
             color: PdfColors.grey800,
@@ -58,7 +70,7 @@ class PdfGenerator {
         pw.SizedBox(height: 10),
         pw.Text(
           'NFPA 25 PUMP INSPECTION REPORT (F-SER-034)',
-          style: pw.TextStyle(
+          style: const pw.TextStyle(
             fontSize: 14,
             fontWeight: pw.FontWeight.bold,
             color: PdfColors.blue900,
@@ -85,7 +97,7 @@ class PdfGenerator {
               children: [
                 pw.Text(
                   'CLIENT INFORMATION',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
                 ),
                 pw.SizedBox(height: 4),
                 pw.Text(
@@ -100,7 +112,7 @@ class PdfGenerator {
               children: [
                 pw.Text(
                   'DATE',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
                 ),
                 pw.SizedBox(height: 4),
                 pw.Text(dateString),
@@ -124,9 +136,9 @@ class PdfGenerator {
   static pw.Widget _buildPumpSpecs(InspectionRecord record) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(12),
-      decoration: pw.BoxDecoration(
+      decoration: const pw.BoxDecoration(
         color: PdfColors.grey100,
-        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+        borderRadius: pw.BorderRadius.all(pw.Radius.circular(4)),
       ),
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
@@ -144,7 +156,10 @@ class PdfGenerator {
       children: [
         pw.Text(
           label,
-          style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+          style: const pw.TextStyle(
+            fontSize: 10,
+            fontWeight: pw.FontWeight.bold,
+          ),
         ),
         pw.SizedBox(height: 4),
         pw.Text(value, style: const pw.TextStyle(fontSize: 14)),
@@ -161,7 +176,7 @@ class PdfGenerator {
       children: [
         pw.Text(
           'DATOS DEL EQUIPO',
-          style: pw.TextStyle(
+          style: const pw.TextStyle(
             fontSize: 13,
             fontWeight: pw.FontWeight.bold,
             color: PdfColors.blue900,
@@ -280,7 +295,7 @@ class PdfGenerator {
       padding: const pw.EdgeInsets.only(bottom: 4),
       child: pw.Text(
         text,
-        style: pw.TextStyle(
+        style: const pw.TextStyle(
           fontSize: 11,
           fontWeight: pw.FontWeight.bold,
           color: PdfColors.grey800,
@@ -317,7 +332,7 @@ class PdfGenerator {
           children: [
             pw.TextSpan(
               text: '${pair.key}: ',
-              style: pw.TextStyle(
+              style: const pw.TextStyle(
                 fontSize: 9,
                 fontWeight: pw.FontWeight.bold,
                 color: PdfColors.grey700,
@@ -365,7 +380,7 @@ class PdfGenerator {
       headers: headers,
       data: data,
       border: pw.TableBorder.all(color: PdfColors.grey400, width: 0.5),
-      headerStyle: pw.TextStyle(
+      headerStyle: const pw.TextStyle(
         fontSize: 9,
         fontWeight: pw.FontWeight.bold,
         color: PdfColors.white,

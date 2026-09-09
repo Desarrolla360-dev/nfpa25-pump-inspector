@@ -8,7 +8,11 @@ import '../utils/app_typography.dart';
 import '../providers/pump_test_provider.dart';
 import '../widgets/pump_curve_chart.dart';
 import '../widgets/signature_pad.dart';
-import '../widgets/data_plate.dart';
+import '../widgets/section_title.dart';
+import '../widgets/app_text_field.dart';
+import '../widgets/app_segmented_field.dart';
+import '../widgets/responsive_row.dart';
+import '../widgets/test_point_card.dart';
 import '../utils/responsive.dart';
 
 class FormScreen extends ConsumerStatefulWidget {
@@ -287,7 +291,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('Datos Generales'),
+        const SectionTitle('Datos Generales'),
         const SizedBox(height: 16),
         TextFormField(
           controller: _companyController,
@@ -297,21 +301,21 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           decoration: const InputDecoration(labelText: 'Nombre de la empresa'),
         ),
         const SizedBox(height: 16),
-        _responsiveRow([
-          _textField(
+        ResponsiveRow([
+          AppTextField(
             controller: _contactNameController,
             label: 'Nombre del contacto',
             onChanged: (v) =>
                 _updateEquipment((e) => e.copyWith(contactName: v)),
           ),
-          _textField(
+          AppTextField(
             controller: _cityStateController,
             label: 'Ciudad y Estado',
             onChanged: (v) => _updateEquipment((e) => e.copyWith(cityState: v)),
           ),
         ]),
         const SizedBox(height: 16),
-        _textField(
+        AppTextField(
           controller: _systemTypeController,
           label: 'Sistema (ej. Bomba Eléctrica)',
           onChanged: (v) => _updateEquipment((e) => e.copyWith(systemType: v)),
@@ -328,9 +332,9 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('Identificación de la Bomba'),
+        const SectionTitle('Identificación de la Bomba'),
         const SizedBox(height: 16),
-        _segmentedField<PumpOrientation>(
+        AppSegmentedField<PumpOrientation>(
           label: 'Orientación',
           value: equipment.pumpOrientation,
           options: const [
@@ -341,18 +345,18 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               _updateEquipment((e) => e.copyWith(pumpOrientation: v)),
         ),
         const SizedBox(height: 16),
-        _responsiveRow([
-          _textField(
+        ResponsiveRow([
+          AppTextField(
             controller: _pumpBrandController,
             label: 'Marca',
             onChanged: (v) => _updateEquipment((e) => e.copyWith(pumpBrand: v)),
           ),
-          _textField(
+          AppTextField(
             controller: _pumpModelController,
             label: 'Modelo',
             onChanged: (v) => _updateEquipment((e) => e.copyWith(pumpModel: v)),
           ),
-          _textField(
+          AppTextField(
             controller: _pumpSerialController,
             label: 'N° de Serie',
             onChanged: (v) =>
@@ -360,7 +364,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ]),
         const SizedBox(height: 16),
-        _textField(
+        AppTextField(
           controller: _impellerDiameterController,
           label: 'Diámetro de Impulsor',
           suffixText: 'in',
@@ -370,22 +374,22 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ),
         const SizedBox(height: 24),
-        _sectionTitle('Datos Nominales'),
+        const SectionTitle('Datos Nominales'),
         const SizedBox(height: 16),
-        _responsiveRow([
-          _textField(
+        ResponsiveRow([
+          AppTextField(
             controller: _gpmController,
             label: 'Flujo Nominal (GPM)',
             suffixText: 'GPM',
             numeric: true,
           ),
-          _textField(
+          AppTextField(
             controller: _psiController,
             label: 'Presión Nominal (PSI)',
             suffixText: 'PSI',
             numeric: true,
           ),
-          _textField(
+          AppTextField(
             controller: _rpmController,
             label: 'Vel. Nominal (RPM)',
             suffixText: 'RPM',
@@ -393,8 +397,8 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ]),
         const SizedBox(height: 16),
-        _responsiveRow([
-          _textField(
+        ResponsiveRow([
+          AppTextField(
             controller: _maxDevelopedPressureController,
             label: 'Máxima Presión Desarrollada',
             suffixText: 'PSI',
@@ -404,7 +408,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                   e.copyWith(maxDevelopedPressure: double.tryParse(v) ?? 0.0),
             ),
           ),
-          _textField(
+          AppTextField(
             controller: _pressureAt150Controller,
             label: 'Presión al 150% de Capacidad',
             suffixText: 'PSI',
@@ -416,7 +420,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ]),
         const SizedBox(height: 16),
-        _segmentedField<bool>(
+        AppSegmentedField<bool>(
           label: 'Estado de la Bomba',
           value: equipment.pumpApproved,
           options: const [(true, 'Aprobada'), (false, 'No Aprobada')],
@@ -424,7 +428,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               _updateEquipment((e) => e.copyWith(pumpApproved: v)),
         ),
         const SizedBox(height: 24),
-        _segmentedField<MotorFuelType>(
+        AppSegmentedField<MotorFuelType>(
           label: 'Tipo de Motor que Impulsa la Bomba',
           value: equipment.motorFuelType,
           options: const [
@@ -436,16 +440,16 @@ class _FormScreenState extends ConsumerState<FormScreen> {
         ),
         if (equipment.motorFuelType == MotorFuelType.diesel) ...[
           const SizedBox(height: 24),
-          _sectionTitle('Cabezal de Engranes'),
+          const SectionTitle('Cabezal de Engranes'),
           const SizedBox(height: 16),
-          _responsiveRow([
-            _textField(
+          ResponsiveRow([
+            AppTextField(
               controller: _gearHeadBrandController,
               label: 'Marca',
               onChanged: (v) =>
                   _updateEquipment((e) => e.copyWith(gearHeadBrand: v)),
             ),
-            _textField(
+            AppTextField(
               controller: _gearHeadModelController,
               label: 'Modelo',
               onChanged: (v) =>
@@ -453,14 +457,14 @@ class _FormScreenState extends ConsumerState<FormScreen> {
             ),
           ]),
           const SizedBox(height: 16),
-          _responsiveRow([
-            _textField(
+          ResponsiveRow([
+            AppTextField(
               controller: _gearHeadSerialController,
               label: 'N° de Serie',
               onChanged: (v) =>
                   _updateEquipment((e) => e.copyWith(gearHeadSerialNumber: v)),
             ),
-            _textField(
+            AppTextField(
               controller: _gearHeadRatioController,
               label: 'Relación',
               onChanged: (v) =>
@@ -480,7 +484,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('Datos del Motor'),
+        const SectionTitle('Datos del Motor'),
         const SizedBox(height: 4),
         Text(
           'Tipo: ${equipment.motorFuelType == MotorFuelType.diesel ? 'Diésel' : 'Eléctrico'} '
@@ -492,20 +496,20 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        _responsiveRow([
-          _textField(
+        ResponsiveRow([
+          AppTextField(
             controller: _motorBrandController,
             label: 'Marca',
             onChanged: (v) =>
                 _updateEquipment((e) => e.copyWith(motorBrand: v)),
           ),
-          _textField(
+          AppTextField(
             controller: _motorModelController,
             label: 'Modelo',
             onChanged: (v) =>
                 _updateEquipment((e) => e.copyWith(motorModel: v)),
           ),
-          _textField(
+          AppTextField(
             controller: _motorSerialController,
             label: 'N° de Serie',
             onChanged: (v) =>
@@ -513,8 +517,8 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ]),
         const SizedBox(height: 16),
-        _responsiveRow([
-          _textField(
+        ResponsiveRow([
+          AppTextField(
             controller: _motorRpmController,
             label: 'RPM',
             numeric: true,
@@ -522,7 +526,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               (e) => e.copyWith(motorRpm: double.tryParse(v) ?? 0.0),
             ),
           ),
-          _textField(
+          AppTextField(
             controller: _motorHpController,
             label: 'HP',
             numeric: true,
@@ -530,7 +534,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               (e) => e.copyWith(motorHp: double.tryParse(v) ?? 0.0),
             ),
           ),
-          _textField(
+          AppTextField(
             controller: _motorVoltsController,
             label: 'Volts',
             numeric: true,
@@ -540,8 +544,8 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ]),
         const SizedBox(height: 16),
-        _responsiveRow([
-          _textField(
+        ResponsiveRow([
+          AppTextField(
             controller: _motorFlaController,
             label: 'F.L.A.',
             numeric: true,
@@ -549,7 +553,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               (e) => e.copyWith(motorFla: double.tryParse(v) ?? 0.0),
             ),
           ),
-          _textField(
+          AppTextField(
             controller: _motorServiceFactorController,
             label: 'Factor de Servicio',
             numeric: true,
@@ -559,7 +563,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ]),
         const SizedBox(height: 16),
-        _segmentedField<bool>(
+        AppSegmentedField<bool>(
           label: 'Estado del Motor',
           value: equipment.motorApproved,
           options: const [(true, 'Aprobado'), (false, 'No Aprobado')],
@@ -578,22 +582,22 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('Datos del Controlador'),
+        const SectionTitle('Datos del Controlador'),
         const SizedBox(height: 16),
-        _responsiveRow([
-          _textField(
+        ResponsiveRow([
+          AppTextField(
             controller: _controllerBrandController,
             label: 'Marca',
             onChanged: (v) =>
                 _updateEquipment((e) => e.copyWith(controllerBrand: v)),
           ),
-          _textField(
+          AppTextField(
             controller: _controllerModelController,
             label: 'Modelo',
             onChanged: (v) =>
                 _updateEquipment((e) => e.copyWith(controllerModel: v)),
           ),
-          _textField(
+          AppTextField(
             controller: _controllerSerialController,
             label: 'N° de Serie',
             onChanged: (v) =>
@@ -601,7 +605,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ]),
         const SizedBox(height: 16),
-        _textField(
+        AppTextField(
           controller: _controllerVoltageController,
           label: 'Voltaje',
           suffixText: 'Volts',
@@ -611,7 +615,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        _segmentedField<OperationMode>(
+        AppSegmentedField<OperationMode>(
           label: 'Modo de Operación',
           value: equipment.operationMode,
           options: const [
@@ -622,8 +626,8 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               _updateEquipment((e) => e.copyWith(operationMode: v)),
         ),
         const SizedBox(height: 16),
-        _responsiveRow([
-          _textField(
+        ResponsiveRow([
+          AppTextField(
             controller: _startPressureController,
             label: 'Presión de Arranque',
             suffixText: 'PSI',
@@ -632,7 +636,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
               (e) => e.copyWith(startPressure: double.tryParse(v) ?? 0.0),
             ),
           ),
-          _textField(
+          AppTextField(
             controller: _stopPressureController,
             label: 'Presión de Paro',
             suffixText: 'PSI',
@@ -643,7 +647,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ]),
         const SizedBox(height: 16),
-        _segmentedField<bool>(
+        AppSegmentedField<bool>(
           label: 'Estado del Controlador',
           value: equipment.controllerApproved,
           options: const [(true, 'Aprobado'), (false, 'No Aprobado')],
@@ -662,9 +666,9 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('Almacenamiento de Agua'),
+        const SectionTitle('Almacenamiento de Agua'),
         const SizedBox(height: 16),
-        _segmentedField<StorageType>(
+        AppSegmentedField<StorageType>(
           label: 'Tipo',
           value: equipment.storageType,
           options: const [
@@ -674,7 +678,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           onChanged: (v) => _updateEquipment((e) => e.copyWith(storageType: v)),
         ),
         const SizedBox(height: 16),
-        _textField(
+        AppTextField(
           controller: _waterColumnController,
           label: 'Columna de Agua',
           suffixText: 'Pies',
@@ -692,7 +696,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        _textField(
+        AppTextField(
           controller: _storageCapacityController,
           label: 'Capacidad (ej. 400 M3)',
           onChanged: (v) =>
@@ -706,21 +710,18 @@ class _FormScreenState extends ConsumerState<FormScreen> {
   // Prueba
   // ---------------------------------------------------------------------
 
-  Widget _buildPruebaStep(dynamic testState) {
+  Widget _buildPruebaStep(PumpTest testState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('Captura Hidráulica'),
+        const SectionTitle('Captura Hidráulica'),
         const SizedBox(height: 16),
         Builder(
           builder: (context) {
             if (!Responsive.isTablet(context)) {
               return Column(
                 children: List.generate(testState.testPoints.length, (index) {
-                  return _buildTestPointCard(
-                    index,
-                    testState.testPoints[index],
-                  );
+                  return _testPointCardFor(index, testState.testPoints[index]);
                 }),
               );
             }
@@ -733,12 +734,12 @@ class _FormScreenState extends ConsumerState<FormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: _buildTestPointCard(i, testState.testPoints[i]),
+                      child: _testPointCardFor(i, testState.testPoints[i]),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: hasSecond
-                          ? _buildTestPointCard(
+                          ? _testPointCardFor(
                               i + 1,
                               testState.testPoints[i + 1],
                             )
@@ -755,6 +756,17 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     );
   }
 
+  /// Wires a [TestPointCard] to this screen's provider for one test point.
+  Widget _testPointCardFor(int index, TestPoint point) {
+    return TestPointCard(
+      point: point,
+      onFlowGpmChanged: (v) => _updatePoint(index, point, flowGpm: v),
+      onSuctionChanged: (v) => _updatePoint(index, point, suction: v),
+      onDischargeChanged: (v) => _updatePoint(index, point, discharge: v),
+      onRpmChanged: (v) => _updatePoint(index, point, rpm: v),
+    );
+  }
+
   // ---------------------------------------------------------------------
   // Gráfica
   // ---------------------------------------------------------------------
@@ -763,7 +775,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('Análisis de Rendimiento'),
+        const SectionTitle('Análisis de Rendimiento'),
         const SizedBox(height: 16),
         PumpCurveChart(
           testPoints: testState.testPoints,
@@ -804,7 +816,7 @@ class _FormScreenState extends ConsumerState<FormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('Validación y Firmas'),
+        const SectionTitle('Validación y Firmas'),
         const SizedBox(height: 16),
         Builder(
           builder: (context) {
@@ -840,259 +852,6 @@ class _FormScreenState extends ConsumerState<FormScreen> {
   // ---------------------------------------------------------------------
   // Helpers de UI compartidos entre pasos
   // ---------------------------------------------------------------------
-
-  /// Arma los campos en una fila (tablet) o apilados (teléfono), separados
-  /// consistentemente, para no repetir el patrón Responsive en cada paso.
-  Widget _responsiveRow(List<Widget> fields) {
-    return Builder(
-      builder: (context) {
-        if (!Responsive.isTablet(context)) {
-          return Column(
-            children: [
-              for (var i = 0; i < fields.length; i++) ...[
-                if (i > 0) const SizedBox(height: 16),
-                fields[i],
-              ],
-            ],
-          );
-        }
-
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (var i = 0; i < fields.length; i++) ...[
-              if (i > 0) const SizedBox(width: 16),
-              Expanded(child: fields[i]),
-            ],
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _textField({
-    required TextEditingController controller,
-    required String label,
-    String? suffixText,
-    bool numeric = false,
-    ValueChanged<String>? onChanged,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: numeric ? TextInputType.number : TextInputType.text,
-      onChanged: onChanged,
-      decoration: InputDecoration(labelText: label, suffixText: suffixText),
-    );
-  }
-
-  Widget _sectionTitle(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontFamily: 'Oswald',
-        fontSize: 19,
-        fontWeight: FontWeight.w600,
-        color: AppColors.primaryBlue,
-        letterSpacing: 0.2,
-      ),
-    );
-  }
-
-  Widget _segmentedField<T>({
-    required String label,
-    required T value,
-    required List<(T, String)> options,
-    required ValueChanged<T> onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 6),
-        SegmentedButton<T>(
-          segments: [
-            for (final option in options)
-              ButtonSegment<T>(value: option.$1, label: Text(option.$2)),
-          ],
-          selected: {value},
-          onSelectionChanged: (selection) => onChanged(selection.first),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTestPointCard(int index, dynamic point) {
-    final pointStatusColor = point.adjustedPressure > 0
-        ? (point.isPassed ? AppColors.successGreen : AppColors.errorRed)
-        : AppColors.pendingAmber;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: DataPlate(
-        accentColor: pointStatusColor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Flujo al ${point.flowPercentage}%',
-                  style: const TextStyle(
-                    fontFamily: 'Oswald',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryBlue,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: point.adjustedPressure > 0
-                        ? (point.isPassed
-                              ? AppColors.successGreen
-                              : AppColors.errorRed)
-                        : AppColors.pendingAmber,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    point.adjustedPressure > 0
-                        ? (point.isPassed ? 'PASS' : 'FAIL')
-                        : 'PENDIENTE',
-                    style: AppTypography.badge.copyWith(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'GPM Medido',
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 8,
-                      ),
-                    ),
-                    onChanged: (value) =>
-                        _updatePoint(index, point, flowGpm: value),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Succión (PSI)',
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 8,
-                      ),
-                    ),
-                    onChanged: (value) =>
-                        _updatePoint(index, point, suction: value),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Descarga (PSI)',
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 8,
-                      ),
-                    ),
-                    onChanged: (value) =>
-                        _updatePoint(index, point, discharge: value),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'RPM Medido',
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 8,
-                      ),
-                    ),
-                    onChanged: (value) =>
-                        _updatePoint(index, point, rpm: value),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: AppColors.hairline),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      style: const TextStyle(color: AppColors.textSecondary),
-                      children: [
-                        const TextSpan(text: 'Presión Neta: '),
-                        TextSpan(
-                          text: '${point.netPressure.toStringAsFixed(2)} PSI',
-                          style: AppTypography.dataValue.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text.rich(
-                    TextSpan(
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      children: [
-                        const TextSpan(text: 'Presión Ajustada: '),
-                        TextSpan(
-                          text:
-                              '${point.adjustedPressure.toStringAsFixed(2)} PSI',
-                          style: AppTypography.dataValueLarge,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   void _updatePoint(
     int index,

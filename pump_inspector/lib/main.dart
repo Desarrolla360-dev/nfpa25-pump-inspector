@@ -4,7 +4,9 @@ import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
 import 'utils/app_colors.dart';
+import 'utils/auth_session.dart';
 import 'collections/inspection_record.dart';
 import 'models/pump_test_model.dart';
 import 'utils/math_engine.dart';
@@ -18,7 +20,9 @@ void main() async {
 
   await _seedSampleData();
 
-  runApp(const ProviderScope(child: MainApp()));
+  final isLoggedIn = await AuthSession.isLoggedIn();
+
+  runApp(ProviderScope(child: MainApp(startLoggedIn: isLoggedIn)));
 }
 
 // TEMPORAL: crea 2 inspecciones de ejemplo para pruebas manuales.
@@ -295,7 +299,9 @@ Future<void> _seedSampleData() async {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final bool startLoggedIn;
+
+  const MainApp({super.key, required this.startLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -323,15 +329,8 @@ class MainApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.background,
         fontFamily: 'Inter',
         textTheme: const TextTheme(
-          titleLarge: TextStyle(
-            fontFamily: 'Oswald',
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.2,
-          ),
-          titleMedium: TextStyle(
-            fontFamily: 'Oswald',
-            fontWeight: FontWeight.w600,
-          ),
+          titleLarge: TextStyle(fontWeight: FontWeight.w700),
+          titleMedium: TextStyle(fontWeight: FontWeight.w700),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.background,
@@ -339,11 +338,9 @@ class MainApp extends StatelessWidget {
           scrolledUnderElevation: 0,
           iconTheme: IconThemeData(color: AppColors.primaryBlue),
           titleTextStyle: TextStyle(
-            fontFamily: 'Oswald',
             color: AppColors.primaryBlue,
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
+            fontSize: 21,
+            fontWeight: FontWeight.w700,
           ),
         ),
         cardTheme: CardThemeData(
@@ -428,7 +425,7 @@ class MainApp extends StatelessWidget {
           extendedTextStyle: TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
-      home: const HomeScreen(),
+      home: startLoggedIn ? const HomeScreen() : const LoginScreen(),
     );
   }
 }

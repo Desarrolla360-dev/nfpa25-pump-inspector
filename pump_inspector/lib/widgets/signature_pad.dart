@@ -27,8 +27,7 @@ class _SignaturePadState extends State<SignaturePad> {
         Text(
           widget.label,
           style: const TextStyle(
-            fontFamily: 'Oswald',
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: AppColors.primaryBlue,
           ),
         ),

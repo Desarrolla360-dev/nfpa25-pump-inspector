@@ -103,10 +103,10 @@ class PumpCurveChart extends StatelessWidget {
             horizontalInterval: 20,
             verticalInterval: nominalGpm > 0 ? nominalGpm * 0.5 : 500,
             getDrawingHorizontalLine: (value) {
-              return FlLine(color: AppColors.hairline, strokeWidth: 1);
+              return const FlLine(color: AppColors.hairline, strokeWidth: 1);
             },
             getDrawingVerticalLine: (value) {
-              return FlLine(color: AppColors.hairline, strokeWidth: 1);
+              return const FlLine(color: AppColors.hairline, strokeWidth: 1);
             },
           ),
           titlesData: FlTitlesData(
@@ -121,9 +121,8 @@ class PumpCurveChart extends StatelessWidget {
               axisNameWidget: const Text(
                 'FLUJO (GPM)',
                 style: TextStyle(
-                  fontFamily: 'Oswald',
                   fontSize: 10,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.textSecondary,
                   letterSpacing: 0.4,
                 ),
@@ -150,9 +149,8 @@ class PumpCurveChart extends StatelessWidget {
               axisNameWidget: const Text(
                 'PRESIÓN (PSI)',
                 style: TextStyle(
-                  fontFamily: 'Oswald',
                   fontSize: 10,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.textSecondary,
                   letterSpacing: 0.4,
                 ),

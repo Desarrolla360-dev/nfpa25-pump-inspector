@@ -183,7 +183,9 @@ class PumpCurveChart extends StatelessWidget {
           lineBarsData: [
             LineChartBarData(
               spots: nominalSpots,
-              isCurved: true,
+              // Recta entre los 3 puntos de fábrica: debe coincidir con la
+              // interpolación lineal de MathEngine.expectedFactoryPressure.
+              isCurved: false,
               color: AppColors.primaryBlue,
               barWidth: 2,
               isStrokeCapRound: true,
@@ -191,7 +193,9 @@ class PumpCurveChart extends StatelessWidget {
             ),
             LineChartBarData(
               spots: nfpaLimitSpots,
-              isCurved: true,
+              // Ídem: recta, para que coincida exactamente con el 95% usado
+              // en MathEngine.validateNFPA25Point en cualquier punto del eje X.
+              isCurved: false,
               color: AppColors.pendingAmber,
               barWidth: 2,
               isStrokeCapRound: true,

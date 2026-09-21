@@ -5,15 +5,14 @@ import '../main.dart';
 import '../collections/inspection_record.dart';
 import '../utils/app_colors.dart';
 import '../utils/auth_session.dart';
+import '../utils/inspection_status.dart';
 import 'form_screen.dart';
 import 'login_screen.dart';
 
-import 'package:printing/printing.dart';
-
-import '../utils/pdf_generator.dart';
 import '../utils/responsive.dart';
 import '../widgets/inspection_card.dart';
 import '../widgets/inspection_grid.dart';
+import 'inspection_preview_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -32,7 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadInspections() async {
+    // Sort inspections so the most recent is first
     final records = await isar.inspectionRecords.where().findAll();
+    records.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     setState(() {
       _inspections = records;
     });
@@ -45,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('¿Eliminar inspección?'),
         content: Text(
           'Se eliminará permanentemente el registro de "$companyNameDisplay". Esta acción no se puede deshacer.',
@@ -54,15 +56,16 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => Navigator.pop(ctx, false),
             child: const Text('Cancelar'),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(
-                color: AppColors.errorRed,
-                fontWeight: FontWeight.bold,
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.errorRed,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Eliminar'),
           ),
         ],
       ),
@@ -79,11 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> _openReport(InspectionRecord record) async {
-    final pdfBytes = await PdfGenerator.generateReport(record);
-    await Printing.layoutPdf(
-      onLayout: (format) => pdfBytes,
-      name: 'PETROV_NFPA25_${record.companyName}.pdf',
+  void _openPreview(InspectionRecord record) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => InspectionPreviewScreen(record: record),
+      ),
     );
   }
 
@@ -96,68 +100,175 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildOverviewCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(icon, color: color, size: 24),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary.withValues(alpha: 0.8),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    int total = _inspections.length;
+    int approved = _inspections
+        .where((r) => r.status == InspectionStatus.approved)
+        .length;
+    int failed = _inspections
+        .where((r) => r.status == InspectionStatus.failed)
+        .length;
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Inspecciones PETROV'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Cerrar sesión',
-            onPressed: _logout,
-          ),
-        ],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(24.0),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Panel PETROV',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Resumen',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -1,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        onPressed: _logout,
+                        icon: const Icon(
+                          Icons.logout,
+                          color: AppColors.primaryBlue,
+                          size: 28,
+                        ),
+                        tooltip: 'Cerrar sesión',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  Row(
+                    children: [
+                      _buildOverviewCard(
+                        'Total',
+                        total.toString(),
+                        Icons.assignment_outlined,
+                        AppColors.primaryBlue,
+                      ),
+                      const SizedBox(width: 12),
+                      _buildOverviewCard(
+                        'Aprobadas',
+                        approved.toString(),
+                        Icons.check_circle_outline,
+                        AppColors.successGreen,
+                      ),
+                      const SizedBox(width: 12),
+                      _buildOverviewCard(
+                        'Fallas',
+                        failed.toString(),
+                        Icons.error_outline,
+                        AppColors.errorRed,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 36),
                   const Text(
-                    'Reportes Recientes',
+                    'Inspecciones Recientes',
                     style: TextStyle(
-                      fontSize: 19,
+                      fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
-                      letterSpacing: 0.2,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Expanded(
-                    child: _inspections.isEmpty
-                        ? const _EmptyState()
-                        : Responsive.isTablet(context)
-                        ? InspectionGrid(
-                            inspections: _inspections,
-                            confirmDelete: _confirmDelete,
-                            onDelete: _deleteInspection,
-                            onTap: _openReport,
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.only(bottom: 80),
-                            itemCount: _inspections.length,
-                            itemBuilder: (context, index) {
-                              return InspectionCard(
-                                record: _inspections[index],
-                                confirmDelete: _confirmDelete,
-                                onDelete: _deleteInspection,
-                                onTap: _openReport,
-                              );
-                            },
-                          ),
-                  ),
-                ],
+                ]),
               ),
             ),
-          ),
-        ],
+            if (_inspections.isEmpty)
+              const SliverFillRemaining(child: _EmptyState())
+            else
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0)
+                    .copyWith(bottom: 80),
+                sliver: Responsive.isTablet(context)
+                    ? SliverToBoxAdapter(
+                        child: InspectionGrid(
+                          inspections: _inspections,
+                          confirmDelete: _confirmDelete,
+                          onDelete: _deleteInspection,
+                          onTap: _openPreview,
+                        ),
+                      )
+                    : SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          return InspectionCard(
+                            record: _inspections[index],
+                            confirmDelete: _confirmDelete,
+                            onDelete: _deleteInspection,
+                            onTap: _openPreview,
+                          );
+                        }, childCount: _inspections.length),
+                      ),
+              ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
@@ -167,11 +278,16 @@ class _HomeScreenState extends State<HomeScreen> {
           );
           _loadInspections();
         },
+        elevation: 6,
         backgroundColor: AppColors.primaryRed,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text(
           'Nueva Prueba',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
         ),
       ),
     );
@@ -190,28 +306,28 @@ class _EmptyState extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.primaryBlue.withValues(alpha: 0.05),
+              color: AppColors.textSecondary.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.assignment_outlined,
+            child: Icon(
+              Icons.inbox_outlined,
               size: 56,
-              color: AppColors.primaryBlue,
+              color: AppColors.textSecondary.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 24),
           const Text(
-            'Aún no hay inspecciones',
+            'Bandeja vacía',
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
           const Text(
-            'Toca "Nueva Prueba" para registrar la primera.',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            'Aún no has registrado ninguna prueba.',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
           ),
         ],
       ),

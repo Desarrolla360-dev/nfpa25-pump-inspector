@@ -15,9 +15,6 @@ class MathEngine {
     return double.parse(adjustedPressure.toStringAsFixed(2));
   }
 
-  /// Churn (shutoff, 0 GPM) pressure from the factory curve. Falls back to a
-  /// rough estimate when the technician hasn't captured the real nameplate
-  /// value ("Máxima presión desarrollada") yet.
   static double resolveChurnPressure({
     required double nominalPsi,
     required double maxDevelopedPressure,
@@ -25,8 +22,6 @@ class MathEngine {
     return maxDevelopedPressure > 0 ? maxDevelopedPressure : nominalPsi * 1.2;
   }
 
-  /// Factory pressure at 150% of rated capacity. Falls back to a rough
-  /// estimate when "Presión al 150% de Capacidad" hasn't been captured yet.
   static double resolvePressureAt150({
     required double nominalPsi,
     required double pressureAt150Percent,
@@ -34,10 +29,6 @@ class MathEngine {
     return pressureAt150Percent > 0 ? pressureAt150Percent : nominalPsi * 0.65;
   }
 
-  /// Expected factory pressure at a given flow, linearly interpolating the
-  /// three-point factory curve (0% churn -> 100% nominal -> 150% capacity),
-  /// the same curve drawn in the performance chart and used in the original
-  /// spreadsheet (Grafica!DD13:DD15).
   static double expectedFactoryPressure({
     required double flowGpm,
     required double nominalGpm,
@@ -59,14 +50,10 @@ class MathEngine {
       return nominalPsi + (pressureAt150 - nominalPsi) * ratio;
     }
 
-    // Más allá del 150%: se extrapola con la pendiente del último tramo.
     final slope = (pressureAt150 - nominalPsi) / (maxFlow - nominalGpm);
     return pressureAt150 + slope * (flowGpm - maxFlow);
   }
 
-  /// NFPA-25 8.3.7.3: la prueba es aceptable si el punto ajustado alcanza al
-  /// menos el 95% de la presión esperada de fábrica PARA ESE FLUJO
-  /// específico (no un umbral fijo de la presión nominal).
   static bool validateNFPA25Point({
     required double adjustedPsi,
     required double expectedPsi,

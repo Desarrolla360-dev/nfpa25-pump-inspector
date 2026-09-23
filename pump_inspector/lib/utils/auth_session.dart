@@ -1,9 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'auth_config.dart';
-
-/// Tracks whether the user is logged in, persisted locally so the app
-/// doesn't ask for the password again every time it's reopened.
 class AuthSession {
   AuthSession._();
 
@@ -14,7 +11,6 @@ class AuthSession {
     return prefs.getBool(_loggedInKey) ?? false;
   }
 
-  /// Returns true and persists the session if the credentials match.
   static Future<bool> login({
     required String username,
     required String password,

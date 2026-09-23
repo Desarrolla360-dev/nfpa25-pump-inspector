@@ -32,7 +32,6 @@ flutter:
   uses-material-design: true
   assets:
     - lib/public/logo_black.png
-    - lib/public/logo_white.png
   fonts:
     - family: Inter
       fonts:

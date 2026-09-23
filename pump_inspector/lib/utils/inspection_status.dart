@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../collections/inspection_record.dart';
 import 'app_colors.dart';
 
-/// The 3-way result state for an inspection: no test data captured yet,
-/// every captured point passed, or at least one point failed NFPA-25.
 enum InspectionStatus { pending, approved, failed }
 
 extension InspectionStatusStyle on InspectionStatus {

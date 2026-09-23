@@ -9,8 +9,6 @@ import '../models/pump_test_model.dart';
 
 class PdfGenerator {
   static Future<Uint8List> generateReport(InspectionRecord record) async {
-    // Embed Inter so the report can render full Unicode (tildes, ñ, °, —)
-    // instead of the PDF base-14 Helvetica, which only supports WinAnsi.
     final baseFont = pw.Font.ttf(
       await rootBundle.load('assets/fonts/Inter-Regular.ttf'),
     );
